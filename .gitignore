@@ -1,0 +1,22 @@
+# Python-generated files
+__pycache__/
+*.py[oc]
+build/
+dist/
+wheels/
+*.egg-info
+
+# Virtual environments
+.venv
+.env
+
+# Data
+data/in/*
+!data/in/.gitkeep
+!data/in/pdfs/
+
+data/in/pdfs/*
+!data/in/pdfs/.gitkeep
+
+data/out/*
+!data/out/.gitkeep
