@@ -40,6 +40,7 @@ from .pdf_extractor import extract_text
 from .results_manager import (
     append_result,
     checkpoint_entry,
+    generate_normalized_csv,
     init_csv,
     load_checkpoint,
     load_extracted_text,
@@ -338,10 +339,13 @@ def run(
         phase_analyse(pdfs, checkpoint, dry_run)
 
     if not (dry_run or only_extract):
-        from .config import OUTPUT_CSV
+        from .config import NORMALIZED_CSV, OUTPUT_CSV
+
+        generate_normalized_csv()
 
         print(f"{'=' * 60}")
-        print(f"  Output CSV : {OUTPUT_CSV}")
+        print(f"  Output CSV            : {OUTPUT_CSV}")
+        print(f"  Normalized CSV        : {NORMALIZED_CSV}")
         print(f"{'=' * 60}\n")
 
 
