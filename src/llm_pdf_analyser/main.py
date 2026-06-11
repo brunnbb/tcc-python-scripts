@@ -143,8 +143,8 @@ def print_cost_table(pdfs: list) -> None:
             else "estimated"
         )
         print(
-            f"  {m:<14}  ${est['input_cost']:>6.2f}  ${est['output_cost']:>6.2f}"
-            f"  ${est['total_cost']:>6.2f}  {source}{marker}"
+            f"  {m:<14}  ${est['input_cost']:>6.4f}  ${est['output_cost']:>6.4f}"
+            f"  ${est['total_cost']:>6.4f}  {source}{marker}"
         )
 
     est_default = estimate_cost_from_files(pdfs, MODEL)

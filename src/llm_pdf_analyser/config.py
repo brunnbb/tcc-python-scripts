@@ -17,7 +17,7 @@ CHECKPOINT_FILE = OUTPUT_DIR / "checkpoint.json"
 ERROR_LOG = OUTPUT_DIR / "errors.log"
 
 # ── Default model ─────────────────────────────────────────────────────────────
-MODEL = "gpt-4o-mini"
+MODEL = "gpt-5-mini"
 
 # Per-model pricing (USD per 1 000 tokens)
 # Source: https://developers.openai.com/api/docs/pricing
