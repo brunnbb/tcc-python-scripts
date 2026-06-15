@@ -23,7 +23,7 @@ import csv
 import json
 import logging
 
-from .config import CHECKPOINT_FILE, OUTPUT_CSV, OUTPUT_DIR, TEXTS_DIR
+from .config import CHECKPOINT_FILE, NORMALIZED_CSV, OUTPUT_CSV, OUTPUT_DIR, TEXTS_DIR
 from .questions import QUESTIONS, _make_col_name, get_all_csv_columns
 
 logger = logging.getLogger(__name__)
@@ -132,6 +132,64 @@ def _fill_row_from_gpt(row: dict, gpt_response: dict) -> None:
             if q.get("tem_outro"):
                 outro_key = f"{q_id}_outro_texto"
                 row[outro_key] = gpt_response.get(outro_key, "")
+
+
+# ── Normalized CSV ───────────────────────────────────────────────────────────
+
+
+def generate_normalized_csv() -> None:
+    """
+    Read results.csv and write results_normalized.csv with one column per question.
+
+    - single questions: the selected option text (or "" if none).
+    - multi questions:  comma-separated selected option texts; free-text "outro"
+                        appended at the end when present.
+    """
+    if not OUTPUT_CSV.exists():
+        logger.warning("results.csv not found — nothing to normalize.")
+        return
+
+    norm_cols = ["arquivo", "status"] + [q["id"] for q in QUESTIONS]
+
+    with (
+        open(OUTPUT_CSV, newline="", encoding="utf-8") as fin,
+        open(NORMALIZED_CSV, "w", newline="", encoding="utf-8") as fout,
+    ):
+        reader = csv.DictReader(fin)
+        writer = csv.DictWriter(fout, fieldnames=norm_cols)
+        writer.writeheader()
+
+        for row in reader:
+            norm_row: dict[str, str] = {
+                "arquivo": row.get("arquivo", ""),
+                "status": row.get("status", ""),
+            }
+
+            for q in QUESTIONS:
+                q_id = q["id"]
+
+                if q["tipo"] == "single":
+                    value = ""
+                    for opt in q["opcoes"]:
+                        if row.get(_make_col_name(q_id, opt)) == "1":
+                            value = opt
+                            break
+                    norm_row[q_id] = value
+                else:
+                    selected = [
+                        opt
+                        for opt in q["opcoes"]
+                        if row.get(_make_col_name(q_id, opt)) == "1"
+                    ]
+                    if q.get("tem_outro"):
+                        outro = row.get(f"{q_id}_outro_texto", "").strip()
+                        if outro:
+                            selected.append(outro)
+                    norm_row[q_id] = ", ".join(selected)
+
+            writer.writerow(norm_row)
+
+    logger.info(f"Normalized CSV written: {NORMALIZED_CSV}")
 
 
 # ── Error log ─────────────────────────────────────────────────────────────────
